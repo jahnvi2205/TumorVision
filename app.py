@@ -3,6 +3,9 @@ import numpy as np
 import cv2
 from PIL import Image
 from utils import predict
+import os
+
+PORT = int(os.environ.get("PORT", 8501))
 
 # Page config
 st.set_page_config(
@@ -49,3 +52,4 @@ if uploaded_file is not None:
 
     st.markdown("---")
     st.info("⚠️ This tool is for educational purposes only.")
+
