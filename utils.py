@@ -1,15 +1,5 @@
-import tensorflow as tf
-import numpy as np
 import cv2
-
-# Load model architecture using tf.keras
-with open("model.json", "r") as f:
-    model = tf.keras.models.model_from_json(f.read())
-
-# Load weights
-model.load_weights("model.h5")
-
-CLASSES = ["No Tumor", "Tumor"]
+import numpy as np
 
 def preprocess_image(image):
     image = cv2.resize(image, (224, 224))
@@ -17,8 +7,10 @@ def preprocess_image(image):
     image = np.expand_dims(image, axis=0)
     return image
 
-def predict(image):
-    processed = preprocess_image(image)
-    prediction = model.predict(processed)[0]
-    idx = np.argmax(prediction)
-    return CLASSES[idx], prediction[idx] * 100
+def predict(image, model):
+    image = preprocess_image(image)
+    preds = model.predict(image)
+    confidence = float(preds[0][0] * 100)
+
+    label = "Tumor" if confidence > 50 else "No Tumor"
+    return label, confidence
