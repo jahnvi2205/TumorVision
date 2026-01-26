@@ -3,17 +3,27 @@ import numpy as np
 import cv2
 from PIL import Image
 import os
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import model_from_json
 from utils import predict
 
 PORT = int(os.environ.get("PORT", 8501))
 
-# 🔹 Load model ONCE
+# 🔹 Load model ONCE (JSON + weights)
 @st.cache_resource
 def load_dl_model():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(base_dir, "model.h5")
-    return load_model(model_path)
+
+    json_path = os.path.join(base_dir, "model.json")
+    weights_path = os.path.join(base_dir, "model.h5")
+
+    # Load architecture
+    with open(json_path, "r") as f:
+        model = model_from_json(f.read())
+
+    # Load weights
+    model.load_weights(weights_path)
+
+    return model
 
 model = load_dl_model()
 
@@ -39,7 +49,7 @@ if uploaded_file is not None:
     st.markdown("### 🔍 Prediction Result")
 
     with st.spinner("Analyzing image..."):
-        label, confidence = predict(image_np, model)   # ✅ model passed
+        label, confidence = predict(image_np, model)
 
     if label == "Tumor":
         st.error(f"⚠️ **Tumor Detected** ({confidence:.2f}% confidence)")
@@ -48,5 +58,3 @@ if uploaded_file is not None:
 
     st.markdown("---")
     st.info("⚠️ This tool is for educational purposes only.")
-
-
