@@ -11,7 +11,9 @@ PORT = int(os.environ.get("PORT", 8501))
 # 🔹 Load model ONCE
 @st.cache_resource
 def load_dl_model():
-    return load_model("model.h5")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "model.h5")
+    return load_model(model_path)
 
 model = load_dl_model()
 
@@ -46,4 +48,5 @@ if uploaded_file is not None:
 
     st.markdown("---")
     st.info("⚠️ This tool is for educational purposes only.")
+
 
